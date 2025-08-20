@@ -245,9 +245,9 @@ if not local_conf_path then
 end
 ```
 
-其中 customized_yaml_path 是 ./bin/apisix start 命令传入的 -c/--config 参数，如果没有提供自定义路径，默认读取的是 profile:yaml_path("config") 指向的文件
+1. 其中 customized_yaml_path 是 ./bin/apisix start 命令传入的 -c/--config 参数，如果没有提供自定义路径，默认读取的是 profile:yaml_path("config") 指向的文件
 
-而 yaml_path 还会读取环境变量 APISIX_PROFILE 的值：
+2. 而 yaml_path 还会读取环境变量 APISIX_PROFILE 的值：
 
 ```lua
 local _M = {
@@ -281,13 +281,11 @@ local _M = {
 
 {: file='apisix/core/profile.lua'}
 
-如果 APISIX_PROFILE 指定了值，则指定读取的文件是 config-${APISIX_PROFILE}.yaml 文件，否则是 config.yaml。
+**实际效果**：
+- 如果 `APISIX_PROFILE=dev`，读取 `config-dev.yaml`
+- 如果 `APISIX_PROFILE=prod`，读取 `config-prod.yaml`  
+- 如果未设置，读取 `config.yaml`
 
-即：
-
-- 用户可通过 -c/--config 在 apisix start 指定配置文件路径
-- 或通过环境变量 APISIX_PROFILE 使用 config-${profile}.yaml
-- 默认回退到 config.yaml
 
 ### 支持环境变量替换配置
 
@@ -301,11 +299,11 @@ key_name: ${{ENVIRONMENT_VARIABLE_NAME:=VALUE}}
 
 其中 ENVIRONMENT_VARIABLE_NAME 为环境变量名称，VALUE为默认值
 
-这是有 resolve_conf_var 方法实现的。
+这是由 resolve_conf_var 方法实现的，具体实现不是本文的重点，读者可以自行查看。
 
 ### 合并用户配置与默认配置
 
-APISIX 本身基于自己的最佳实践，提供了默认配置，我们无需填写没一行配置，只需根据自身需要修改某些配置即可。
+APISIX 本身基于自己的最佳实践，提供了默认配置，我们无需填写每一行配置，只需根据自身需要修改某些配置即可。
 
 默认配置在 apisix/cli/config.lua 文件中，也可以查看 conf/config.yaml.example。
 
@@ -313,7 +311,7 @@ APISIX 本身基于自己的最佳实践，提供了默认配置，我们无需�
 local default_conf = require("apisix.cli.config")
 ```
 
-读取了第一步的配置文件以后就会将配置文件中的配置覆盖默认配置中的配置，如果未修改则保持默认配置
+第一步读取的配置文件配置项会覆盖默认配置中的配置项，如果未修改则保持默认配置。
 
 ## 总结
 

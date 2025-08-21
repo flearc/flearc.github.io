@@ -164,7 +164,9 @@ package.path = "/workspace/deps/share/lua/5.1/?.lua;" .. package.path
 
 local template = require("resty.template")
 
+{% raw %}
 local func = template.compile([[here is template render message: {{message}}]])
+{% endraw %}
 
 print(func{ message = "Hello"})
 print(func{ message = "Template"})
